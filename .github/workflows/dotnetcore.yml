@@ -16,7 +16,7 @@ jobs:
       run: git fetch --prune --unshallow
         
     - name: Install GitVersion
-      uses: gittools/actions/setup-gitversion@v0.3
+      uses: gittools/actions/setup-gitversion@v0.9
       with:
           versionSpec: '5.1.x'
       
