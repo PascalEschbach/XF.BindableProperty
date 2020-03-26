@@ -38,116 +38,25 @@ namespace Mono.Cecil {
 			=> typeDef.GetInheritanceChain().Where( t => t.FullName == inheritedType.FullName ).Count() > 0;
 
 
-		public static string GetName( this PropertyDefinition propertyDefinition ) 
-			=> $"{propertyDefinition.DeclaringType.FullName}.{propertyDefinition.Name}";
+		public static IEnumerable<CustomAttribute> GetAttributes( this ICustomAttributeProvider provider, string fullName )
+			=> provider.CustomAttributes.GetAttributes( fullName );
+		public static IEnumerable<CustomAttribute> GetAttributes( this IEnumerable<CustomAttribute> attributes, string fullName ) 
+			=> attributes.Where( attribute => attribute.Constructor.DeclaringType.FullName == fullName );
 
-		public static bool IsCallToMethod( this Instruction instruction, string methodName, out int propertyNameIndex ) {
-			propertyNameIndex = 1;
-			if( !instruction.OpCode.IsCall() ) {
-				return false;
-			}
-			if( !( instruction.Operand is MethodReference methodReference ) ) {
-				return false;
-			}
-			if( methodReference.Name != methodName ) {
-				return false;
-			}
-			var parameterDefinition = methodReference.Parameters.FirstOrDefault( x => x.Name == "propertyName" );
-			if( parameterDefinition != null ) {
-				propertyNameIndex = methodReference.Parameters.Count - parameterDefinition.Index;
-			}
+		public static CustomAttribute GetAttribute( this IEnumerable<CustomAttribute> attributes, string fullName ) 
+			=> attributes.FirstOrDefault( attribute => attribute.Constructor.DeclaringType.FullName == fullName );
+		public static CustomAttribute GetAttribute( this ICustomAttributeProvider provider, string fullName )
+			=> provider.CustomAttributes.GetAttribute( fullName );
 
-			return true;
-		}
-
-		public static bool IsCall( this OpCode opCode ) =>  opCode.Code == Code.Call || opCode.Code == Code.Callvirt;
-
-		public static FieldReference GetGeneric( this FieldDefinition definition ) {
-			if( definition.DeclaringType.HasGenericParameters ) {
-				var declaringType = new GenericInstanceType( definition.DeclaringType );
-				foreach( var parameter in definition.DeclaringType.GenericParameters ) {
-					declaringType.GenericArguments.Add( parameter );
-				}
-				return new FieldReference( definition.Name, definition.FieldType, declaringType );
-			}
-
-			return definition;
-		}
-
-		public static MethodReference GetGeneric( this MethodReference reference ) {
-			if( reference.DeclaringType.HasGenericParameters ) {
-				var declaringType = new GenericInstanceType( reference.DeclaringType );
-				foreach( var parameter in reference.DeclaringType.GenericParameters ) {
-					declaringType.GenericArguments.Add( parameter );
-				}
-				var methodReference = new MethodReference( reference.Name, reference.MethodReturnType.ReturnType, declaringType );
-				foreach( var parameterDefinition in reference.Parameters ) {
-					methodReference.Parameters.Add( parameterDefinition );
-				}
-				methodReference.HasThis = reference.HasThis;
-				return methodReference;
-			}
-
-			return reference;
-		}
-
-		public static MethodReference MakeGeneric( this MethodReference method, params TypeReference[] args ) {
-			if( args.Length == 0 )
-				return method;
-
-			if( method.GenericParameters.Count != args.Length )
-				throw new ArgumentException( "Invalid number of generic type arguments supplied" );
-
-			var genericTypeRef = new GenericInstanceMethod( method );
-			foreach( var arg in args )
-				genericTypeRef.GenericArguments.Add( arg );
-
-			return genericTypeRef;
-		}
-		public static IEnumerable<CustomAttribute> GetAllCustomAttributes( this TypeDefinition typeDefinition ) {
-			foreach( var attribute in typeDefinition.CustomAttributes )
-				yield return attribute;
-
-			if( typeDefinition.BaseType != null ) {
-				var def = typeDefinition.BaseType as TypeDefinition;
-				if( def == null )
-					def = typeDefinition.BaseType.Resolve();
-
-				foreach( var attr in def.GetAllCustomAttributes() )
-					yield return attr;
-			}
-
-		}
-
-		public static IEnumerable<CustomAttribute> GetAttributes( this IEnumerable<CustomAttribute> attributes, string attributeName ) 
-			=> attributes.Where( attribute => attribute.Constructor.DeclaringType.FullName == attributeName );
-
-		public static CustomAttribute GetAttribute( this IEnumerable<CustomAttribute> attributes, string attributeName ) 
-			=> attributes.FirstOrDefault( attribute => attribute.Constructor.DeclaringType.FullName == attributeName );
-
-		public static bool ContainsAttribute( this IEnumerable<CustomAttribute> attributes, string attributeName ) 
-			=> attributes.Any( attribute => attribute.Constructor.DeclaringType.FullName == attributeName );
-
-		public static bool HasAttribute( this ICustomAttributeProvider provider, string attrName )
-			=> provider != null && provider.CustomAttributes.ContainsAttribute( attrName );
-		public static CustomAttribute GetAttribute( this ICustomAttributeProvider provider, string attrName )
-			=> provider.CustomAttributes.GetAttribute( attrName );
-		public static IEnumerable<CustomAttribute> GetAttributes( this ICustomAttributeProvider provider, string attrName )
-			=> provider.CustomAttributes.GetAttributes( attrName );
-
-		public static bool HasAttribute( this ICustomAttributeProvider provider, TypeDefinition attrDef )
-			=> provider != null && provider.CustomAttributes.FirstOrDefault( ( c ) => c.AttributeType.Resolve() == attrDef.Resolve() ) != null;
-		public static CustomAttribute GetAttribute( this ICustomAttributeProvider provider, TypeDefinition attrDef )
-			=> provider != null ? provider.CustomAttributes.FirstOrDefault( ( c ) => c.AttributeType.Resolve() == attrDef.Resolve() ) : null;
-
+		public static bool ContainsAttribute( this IEnumerable<CustomAttribute> attributes, string fullName ) 
+			=> attributes.Any( attribute => attribute.Constructor.DeclaringType.FullName == fullName );
+		public static bool HasAttribute( this ICustomAttributeProvider provider, string fullName )
+			=> provider != null && provider.CustomAttributes.ContainsAttribute( fullName );
+		
 
 		public static T GetValue<T>( this CustomAttribute attribute, string propertyName, T defaultValue = default ) {
 			var value = attribute.Properties.SingleOrDefault( p => p.Name == propertyName ).Argument.Value;
 			return value is null ? defaultValue : (T)value;
 		}
-
-			public static bool HasReturnType( this MethodReference method )
-			=> method.ReturnType.Resolve().Name != "Void";
-
 	}
 }
