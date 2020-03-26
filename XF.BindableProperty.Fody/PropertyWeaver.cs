@@ -30,7 +30,7 @@ public partial class ModuleWeaver {
         property.DeclaringType.IsBeforeFieldInit = false;
 
         //Add static property field
-        var propertyField = new FieldDefinition( property.Name, FieldAttributes.Public | FieldAttributes.Static | FieldAttributes.InitOnly, WeavingTypes.BindablePropertyRef );
+        var propertyField = new FieldDefinition( property.Name + "Property", FieldAttributes.Public | FieldAttributes.Static | FieldAttributes.InitOnly, WeavingTypes.BindablePropertyRef );
         propertyField.CustomAttributes.Add( new CustomAttribute( ModuleDefinition.ImportReference( SystemTypes.CompilerGeneratedAttributeConstructorDef ) ) );
         property.DeclaringType.Fields.Add( propertyField );
 
@@ -42,7 +42,7 @@ public partial class ModuleWeaver {
 
             //BindableProperty Create( string propertyName, Type returnType, Type declaringType, object defaultValue = null, BindingMode defaultBindingMode = BindingMode.OneWay, ValidateValueDelegate validateValue = null, BindingPropertyChangedDelegate propertyChanged = null, BindingPropertyChangingDelegate propertyChanging = null, CoerceValueDelegate coerceValue = null, CreateDefaultValueDelegate defaultValueCreator = null )
             //string propertyName
-            il.Emit( OpCodes.Ldstr, propertyField.Name );
+            il.Emit( OpCodes.Ldstr, property.Name );
             //Type returnType
             il.Emit( OpCodes.Ldtoken, propertyType );
             il.Emit( OpCodes.Call, ModuleDefinition.ImportReference( SystemTypes.GetTypeFromHandleDef ) );
