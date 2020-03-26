@@ -1,0 +1,48 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Fetch all history for all tags and branches
+      run: |
+        git config remote.origin.url https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+        git fetch --prune
+        
+    - name: Install GitVersion
+      uses: gittools/actions/setup-gitversion@v0.3
+      with:
+          versionSpec: '5.1.x'
+    - name: Use GitVersion
+      id: gitversion # step id used as reference for output values
+      uses: gittools/actions/execute-gitversion@v0.3
+      with:
+        mode: Mainline
+        
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 2.2.108 
+    
+#    - name: Build with dotnet
+#      run: dotnet build --configuration Release /p:Version=${{ steps.gitversion.outputs.semVer }}
+
+    - name: Install NuGet client
+      uses: warrenbuckley/Setup-Nuget@v1
+
+    - name: Add private GitHub registry to NuGet
+      run: nuget sources add -name "github" -Source https://nuget.pkg.github.com/HeroicSoft/index.json -Username HeroicSoft -Password ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Pack
+      run: dotnet pack -c Release -o out /p:Version=${{ steps.gitversion.outputs.semVer }}
+
+    - name: Push generated package to GitHub registry
+      run: nuget push .\out\*.nupkg -Source "github" -SkipDuplicate
