@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<SignAssembly>true</SignAssembly>
+		<AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
+		<Authors>Pascal Eschbach</Authors>
+		<Copyright>Copyright $([System.DateTime]::UtcNow.ToString(yyyy)).</Copyright>
+		<Description>Transforms auto properties into xamarin bindable properties.</Description>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<!-- PackageTags are optional. Defaults to 'ILWeaving, Fody, Cecil, AOP' -->
+		<PackageTags>ILWeaving, Fody, Cecil, AOP, Xamarin</PackageTags>
+		<PackageOutputPath>$(SolutionDir)/nugets</PackageOutputPath>
+		<PackageProjectUrl></PackageProjectUrl>
+		<PackageIconUrl></PackageIconUrl>
+	</PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="Fody" Version="6.1.1" PrivateAssets="none" />
+		<PackageReference Include="FodyPackaging" Version="6.1.1" PrivateAssets="All" />
+	</ItemGroup>
+</Project>
