@@ -1,4 +1,4 @@
-# XF.BindableProperty
+# <img src="/Icon.png" height="30px"> XF.BindableProperty.Fody
 
 
 ## Icon
