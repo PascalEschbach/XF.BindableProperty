@@ -44,4 +44,4 @@ jobs:
       run: nuget push .\nugets\*.nupkg -Source "github" -SkipDuplicate
     
     - name: Push to nuget.org
-      run: dotnet nuget push .\nugets\*.nupkg -k ${{ secrets.NugetPush }} -s https://api.nuget.org/v3/index.json
+      run: dotnet nuget push .\nugets\XF.BindableProperty.Fody.${{ steps.gitversion.outputs.semVer }}.nupkg -k ${{ secrets.NugetPush }} -s https://api.nuget.org/v3/index.json
