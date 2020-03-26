@@ -52,7 +52,7 @@ public partial class ModuleWeaver {
 			PropertyChangingMethod = ResolveMethod( attribute.GetValue<string>( Constants.OnPropertyChanging ), $"On{property.Name}Changing",
 				SystemTypes.VoidDef, 
 				WeavingTypes.BindableObjectDef, SystemTypes.ObjectDef, SystemTypes.ObjectDef );
-			CoerceValueMethod = ResolveMethod( attribute.GetValue<string>( Constants.OnCoerceValue ), $"OnCoerce{property.Name}",
+			CoerceValueMethod = ResolveMethod( attribute.GetValue<string>( Constants.OnCoerceValue ), $"OnCoerce{property.Name}Value",
 				SystemTypes.ObjectDef, 
 				WeavingTypes.BindableObjectDef, SystemTypes.ObjectDef );
 			DefaultValueCreatorMethod = ResolveMethod( attribute.GetValue<string>( Constants.OnCreateValue ), $"OnCreate{property.Name}Value",
@@ -65,7 +65,7 @@ public partial class ModuleWeaver {
 		private MethodDefinition ResolveMethod( string name, string searchName, TypeDefinition returnType, params TypeDefinition[] signature ) {
 			if( !string.IsNullOrEmpty( name ) )
 				return Property.DeclaringType.Methods.SingleOrDefault( m => m.Name == name && m.IsStatic && m.HasSameSignature( returnType, signature ) ) ??
-					throw new WeavingException( $"Couldnt find method {name} within {Property.DeclaringType}!" );
+					throw new WeavingException( $"Couldnt find static method {name} within {Property.DeclaringType} matching the required signature!" );
 
 			return Property.DeclaringType.Methods.SingleOrDefault( m => m.Name == searchName && m.IsStatic && m.HasSameSignature( returnType, signature ) );
 		}
