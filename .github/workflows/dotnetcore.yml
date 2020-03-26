@@ -40,7 +40,7 @@ jobs:
       run: nuget sources add -name "github" -Source https://nuget.pkg.github.com/HeroicSoft/index.json -Username HeroicSoft -Password ${{ secrets.GITHUB_TOKEN }}
 
     - name: Build with dotnet
-      run: dotnet build XF.BindableProperty.csproj --configuration Release /p:Version=${{ steps.gitversion.outputs.semVer }}
+      run: dotnet build *\XF.BindableProperty.csproj --configuration Release /p:Version=${{ steps.gitversion.outputs.semVer }}
     
 #    - name: Pack
 #      run: dotnet pack -c Release -o out /p:Version=${{ steps.gitversion.outputs.semVer }}
