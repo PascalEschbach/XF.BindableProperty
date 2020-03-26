@@ -30,7 +30,7 @@ public partial class ModuleWeaver {
 		property.DeclaringType.IsBeforeFieldInit = false;
 
 		//Add static property field
-		var propertyField = new FieldDefinition( property.Name + "Property", FieldAttributes.Public | FieldAttributes.Static | FieldAttributes.InitOnly, WeavingTypes.BindablePropertyRef );
+		var propertyField = new FieldDefinition( property.Name, FieldAttributes.Public | FieldAttributes.Static | FieldAttributes.InitOnly, WeavingTypes.BindablePropertyRef );
 		propertyField.CustomAttributes.Add( new CustomAttribute( ModuleDefinition.ImportReference( SystemTypes.CompilerGeneratedAttributeConstructorDef ) ) );
 		property.DeclaringType.Fields.Add( propertyField );
 
