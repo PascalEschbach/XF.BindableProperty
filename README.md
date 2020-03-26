@@ -1,6 +1,6 @@
 # <img src="/Icon.png" height="30px"> XF.BindableProperty.Fody
 
-![Build Status](https://github.com/HeroicSoft/Treecia/workflows/Build/badge.svg)
+![Build Status](https://github.com/HeroicSoft/XF.BindableProperty/workflows/Build/badge.svg)
 [![NuGet Status](https://img.shields.io/nuget/v/XF.BindableProperty.Fody.svg)](https://nuget.org/packages/XF.BindableProperty.Fody/)
 
 ### This is an add-in for [Fody](https://github.com/Fody/Home/).
