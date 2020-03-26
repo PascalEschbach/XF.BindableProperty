@@ -1,7 +1,7 @@
 # <img src="/Icon.png" height="30px"> XF.BindableProperty.Fody
 
 [![Build Status]()]()
-[![NuGet Status]()]()
+[![NuGet Status](https://img.shields.io/nuget/v/XF.BindableProperty.Fody.svg)](https://nuget.org/packages/XF.BindableProperty.Fody/)
 
 ### This is an add-in for [Fody](https://github.com/Fody/Home/).
 
@@ -155,12 +155,16 @@ public class Foo : BindableObject
 
 
 ## Remarks
-* **Auto-Properties**: Only auto properties are supported. Properties with getter/setter bodies are invalid by definition either way as Xamarin accesses the BindableProperty directly, not the actual property. As such, custom getter/setter implementations would cause diverging behaviours between XAML and code. 
+* **Auto-Properties**: Only auto properties are supported. Properties with getter/setter bodies are invalid by definition as Xamarin accesses the BindableProperty directly, not the actual property. As such, custom getter/setter implementations would cause diverging behaviours between XAML and code. 
 * **OnCoerceValue**: Use this callback to constrain inputs instead of a custom getter/setter!
 * **OnValidateValue**: Use this callback to do any input validation!
 * **OnPropertyChanged/OnPropertyChanging**: Use those callbacks to notify dependant properties or trigger custom behaviour!
 * **OnCreateValue**: Use this callback to construct a default value which required instance level access or runtime information!
 
+## Roadmap
+* Attached properties
+* Dependant property notification
+
 ## Icon
 
-[Link](https://thenounproject.com/term/link/39562/) designed by [Matt Hawdon](https://thenounproject.com/matthawdon/) from The Noun Project.
+[Icon](https://thenounproject.com/term/link/39562/) designed by [Matt Hawdon](https://thenounproject.com/matthawdon/) from The Noun Project.
