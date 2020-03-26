@@ -11,7 +11,7 @@
 		<!-- PackageTags are optional. Defaults to 'ILWeaving, Fody, Cecil, AOP' -->
 		<PackageTags>ILWeaving, Fody, Cecil, AOP, Xamarin</PackageTags>
 		<PackageOutputPath>$(SolutionDir)/nugets</PackageOutputPath>
-		<PackageProjectUrl></PackageProjectUrl>
+		<PackageProjectUrl>https://github.com/HeroicSoft/XF.BindableProperty</PackageProjectUrl>
 		<PackageIconUrl></PackageIconUrl>
 	</PropertyGroup>
 	<ItemGroup>
