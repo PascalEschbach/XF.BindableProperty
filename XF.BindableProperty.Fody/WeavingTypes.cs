@@ -9,24 +9,24 @@ using Mono.Cecil.Rocks;
 public static class WeavingTypes {
 
 	public static TypeDefinition BindableObjectDef { get; private set; }
-	public static TypeReference BindableObjectRef{ get; private set; }
+	public static TypeReference BindableObjectRef { get; private set; }
 
-	public static TypeDefinition BindablePropertyDef{ get; private set; }
-	public static TypeReference BindablePropertyRef{ get; private set; }
+	public static TypeDefinition BindablePropertyDef { get; private set; }
+	public static TypeReference BindablePropertyRef { get; private set; }
 
-	public static MethodReference CreateRef{ get; private set; }
-	public static MethodReference CreateAttachedRef{ get; private set; }
-	public static MethodReference CreateReadonlyRef{ get; private set; }
-	public static MethodReference CreateAttachedReadonlyRef{ get; private set; }
-	public static MethodReference SetValueRef{ get; private set; }
-	public static MethodReference GetValueRef{ get; private set; }
+	public static MethodReference CreateRef { get; private set; }
+	public static MethodReference CreateAttachedRef { get; private set; }
+	public static MethodReference CreateReadonlyRef { get; private set; }
+	public static MethodReference CreateAttachedReadonlyRef { get; private set; }
+	public static MethodReference SetValueRef { get; private set; }
+	public static MethodReference GetValueRef { get; private set; }
 
-	public static TypeReference BindingModeRef{ get; private set; }
-	public static TypeReference ValidateValueDelegateRef{ get; private set; }
-	public static TypeReference BindingPropertyChangedDelegateRef{ get; private set; }
-	public static TypeReference BindingPropertyChangingDelegateRef{ get; private set; }
-	public static TypeReference CoerceValueDelegateRef{ get; private set; }
-	public static TypeReference CreateDefaultValueDelegateRef{ get; private set; }
+	public static TypeReference BindingModeRef { get; private set; }
+	public static TypeReference ValidateValueDelegateRef { get; private set; }
+	public static TypeReference BindingPropertyChangedDelegateRef { get; private set; }
+	public static TypeReference BindingPropertyChangingDelegateRef { get; private set; }
+	public static TypeReference CoerceValueDelegateRef { get; private set; }
+	public static TypeReference CreateDefaultValueDelegateRef { get; private set; }
 
 
 	public static void Initialize( ModuleWeaver weaver ) {
@@ -48,7 +48,7 @@ public static class WeavingTypes {
 		CreateAttachedRef = weaver.ModuleDefinition.ImportReference( BindablePropertyDef.Methods.Single( m => m.Name == "CreateAttached" && m.IsPublic && !m.HasGenericParameters ) );
 		CreateReadonlyRef = weaver.ModuleDefinition.ImportReference( BindablePropertyDef.Methods.Single( m => m.Name == "CreateReadOnly" && m.IsPublic && !m.HasGenericParameters ) );
 		CreateAttachedReadonlyRef = weaver.ModuleDefinition.ImportReference( BindablePropertyDef.Methods.Single( m => m.Name == "CreateAttachedReadOnly" && m.IsPublic && !m.HasGenericParameters ) );
-		
+
 		ValidateValueDelegateRef = weaver.ModuleDefinition.ImportReference( BindablePropertyDef.NestedTypes.Single( t => t.Name == "ValidateValueDelegate" && !t.HasGenericParameters ) );
 		BindingPropertyChangedDelegateRef = weaver.ModuleDefinition.ImportReference( BindablePropertyDef.NestedTypes.Single( t => t.Name == "BindingPropertyChangedDelegate" && !t.HasGenericParameters ) );
 		BindingPropertyChangingDelegateRef = weaver.ModuleDefinition.ImportReference( BindablePropertyDef.NestedTypes.Single( t => t.Name == "BindingPropertyChangingDelegate" && !t.HasGenericParameters ) );

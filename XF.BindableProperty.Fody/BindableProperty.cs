@@ -17,8 +17,8 @@ public partial class ModuleWeaver {
 
 	public class BindableProperty {
 
-		public PropertyDefinition Property { get; } 
-		public FieldDefinition BackingField { get; }		
+		public PropertyDefinition Property { get; }
+		public FieldDefinition BackingField { get; }
 		public TypeDefinition OwningType { get; }
 
 		public XFBindingMode BindingMode { get; }
@@ -43,17 +43,17 @@ public partial class ModuleWeaver {
 
 			BindingMode = attribute.GetValue( Constants.BindingMode, XFBindingMode.OneWay );
 
-			ValidateValueMethod = ResolveMethod( attribute.GetValue<string>( Constants.OnValidateValue ), $"OnValidate{property.Name}Value", 
-				SystemTypes.BoolDef, 
+			ValidateValueMethod = ResolveMethod( attribute.GetValue<string>( Constants.OnValidateValue ), $"OnValidate{property.Name}Value",
+				SystemTypes.BoolDef,
 				WeavingTypes.BindableObjectDef, SystemTypes.ObjectDef );
-			PropertyChangedMethod = ResolveMethod( attribute.GetValue<string>( Constants.OnPropertyChanged ), $"On{property.Name}Changed", 
-				SystemTypes.VoidDef, 
+			PropertyChangedMethod = ResolveMethod( attribute.GetValue<string>( Constants.OnPropertyChanged ), $"On{property.Name}Changed",
+				SystemTypes.VoidDef,
 				WeavingTypes.BindableObjectDef, SystemTypes.ObjectDef, SystemTypes.ObjectDef );
 			PropertyChangingMethod = ResolveMethod( attribute.GetValue<string>( Constants.OnPropertyChanging ), $"On{property.Name}Changing",
-				SystemTypes.VoidDef, 
+				SystemTypes.VoidDef,
 				WeavingTypes.BindableObjectDef, SystemTypes.ObjectDef, SystemTypes.ObjectDef );
 			CoerceValueMethod = ResolveMethod( attribute.GetValue<string>( Constants.OnCoerceValue ), $"OnCoerce{property.Name}Value",
-				SystemTypes.ObjectDef, 
+				SystemTypes.ObjectDef,
 				WeavingTypes.BindableObjectDef, SystemTypes.ObjectDef );
 			DefaultValueCreatorMethod = ResolveMethod( attribute.GetValue<string>( Constants.OnCreateValue ), $"OnCreate{property.Name}Value",
 				SystemTypes.ObjectDef,

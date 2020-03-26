@@ -36,7 +36,7 @@ public static class SystemTypes {
 	public static MethodDefinition CompilerGeneratedAttributeConstructorDef => CompilerGeneratedAttributeDef.GetConstructors().Single();
 
 	public static TypeDefinition RuntimeTypeHandleDef => __weaver.FindTypeDefinition( typeof( RuntimeTypeHandle ).Name );
-	public static MethodDefinition GetTypeFromHandleDef => TypeDef.Methods.Single( m => m.Name == nameof(Type.GetTypeFromHandle) );
+	public static MethodDefinition GetTypeFromHandleDef => TypeDef.Methods.Single( m => m.Name == nameof( Type.GetTypeFromHandle ) );
 
 
 	public static void Initialize( ModuleWeaver weaver )

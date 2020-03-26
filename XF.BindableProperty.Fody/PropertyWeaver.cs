@@ -9,9 +9,9 @@ using Mono.Cecil.Rocks;
 
 public partial class ModuleWeaver {
 
-	private void WeaveProperty( BindableProperty propertyInfo ) {
+    private void WeaveProperty( BindableProperty propertyInfo ) {
 
-		var property = propertyInfo.Property;
+        var property = propertyInfo.Property;
         var propertyType = ModuleDefinition.ImportReference( property.PropertyType );
 
         //Remove attribute
@@ -22,17 +22,17 @@ public partial class ModuleWeaver {
 
         //Find static constructor
         var staticConstructorFlags = MethodAttributes.Private | MethodAttributes.HideBySig | MethodAttributes.SpecialName | MethodAttributes.RTSpecialName | MethodAttributes.Static;
-		var staticConstructor = property.DeclaringType.Methods.FirstOrDefault( x => x.Name == ".cctor" && x.Attributes.HasFlag( staticConstructorFlags ) );
-		if( staticConstructor is null ) {
-			staticConstructor = new MethodDefinition( ".cctor", MethodAttributes.Private | staticConstructorFlags, ModuleDefinition.TypeSystem.Void );
-			property.DeclaringType.Methods.Add( staticConstructor );
-		}
-		property.DeclaringType.IsBeforeFieldInit = false;
+        var staticConstructor = property.DeclaringType.Methods.FirstOrDefault( x => x.Name == ".cctor" && x.Attributes.HasFlag( staticConstructorFlags ) );
+        if( staticConstructor is null ) {
+            staticConstructor = new MethodDefinition( ".cctor", MethodAttributes.Private | staticConstructorFlags, ModuleDefinition.TypeSystem.Void );
+            property.DeclaringType.Methods.Add( staticConstructor );
+        }
+        property.DeclaringType.IsBeforeFieldInit = false;
 
-		//Add static property field
-		var propertyField = new FieldDefinition( property.Name, FieldAttributes.Public | FieldAttributes.Static | FieldAttributes.InitOnly, WeavingTypes.BindablePropertyRef );
-		propertyField.CustomAttributes.Add( new CustomAttribute( ModuleDefinition.ImportReference( SystemTypes.CompilerGeneratedAttributeConstructorDef ) ) );
-		property.DeclaringType.Fields.Add( propertyField );
+        //Add static property field
+        var propertyField = new FieldDefinition( property.Name, FieldAttributes.Public | FieldAttributes.Static | FieldAttributes.InitOnly, WeavingTypes.BindablePropertyRef );
+        propertyField.CustomAttributes.Add( new CustomAttribute( ModuleDefinition.ImportReference( SystemTypes.CompilerGeneratedAttributeConstructorDef ) ) );
+        property.DeclaringType.Fields.Add( propertyField );
 
         //Weave static property field construction
         if( !staticConstructor.Body.Instructions.Any( x => x.OpCode == OpCodes.Stsfld && x.Operand is FieldDefinition && ( x.Operand as FieldDefinition ).Name == ( property.Name + "Property" ) ) ) {
@@ -83,9 +83,9 @@ public partial class ModuleWeaver {
             il.Emit( OpCodes.Ldsfld, propertyField );
             il.Emit( OpCodes.Call, WeavingTypes.GetValueRef );
 
-            if( propertyType.IsValueType ) 
+            if( propertyType.IsValueType )
                 il.Emit( OpCodes.Unbox_Any, propertyType );
-            else 
+            else
                 il.Emit( OpCodes.Castclass, propertyType );
 
             il.Emit( OpCodes.Ret );
@@ -93,8 +93,8 @@ public partial class ModuleWeaver {
 
         //Weave setter
         if( property.SetMethod != null ) {
-			property.SetMethod.Body.Instructions.Clear();
-			var il = property.SetMethod.Body.GetILProcessor();
+            property.SetMethod.Body.Instructions.Clear();
+            var il = property.SetMethod.Body.GetILProcessor();
 
             il.Emit( OpCodes.Ldarg, 0 );
             il.Emit( OpCodes.Ldsfld, propertyField );
@@ -106,7 +106,7 @@ public partial class ModuleWeaver {
 
             il.Emit( OpCodes.Ret );
         }
-	}
+    }
 
     private void EmitDelegate( ILProcessor il, TypeDefinition delegateType, MethodDefinition method ) {
         il.Emit( OpCodes.Ldnull );
@@ -120,20 +120,20 @@ public partial class ModuleWeaver {
     private void HandleDefaultValue( BindableProperty property, ILProcessor il ) {
 
         var constructors = property.Property.DeclaringType.GetConstructors();
-        if( !constructors.Any()) {
+        if( !constructors.Any() ) {
             EmitDefaultValue( property.Property, il );
             return;
         }
 
         Instruction[] initialization = null;
-        
+
         foreach( var ctor in constructors ) {
 
             ctor.Body.SimplifyMacros();
             var assignments = ctor.Body.Instructions
                 .Where( i => i.OpCode.Code == Code.Stfld && i.Operand is FieldReference field && field.Name == property.BackingField.Name )
                 .ToArray();
-                 
+
             if( assignments.Count() > 1 )
                 throw new WeavingException( "Cannot assign field more than once!" );
 
@@ -169,7 +169,7 @@ public partial class ModuleWeaver {
                 .ToArray();
 
             //Remove only those variables which arent reused in the remaining instructions (just in case)
-            foreach( var variable in variables.Where( v => !ctor.Body.Instructions.Any( i => i.Operand == v )))
+            foreach( var variable in variables.Where( v => !ctor.Body.Instructions.Any( i => i.Operand == v ) ) )
                 ctor.Body.Variables.Remove( variable );
 
             //Remove trailing stfld as we only use the actual construction of the argument

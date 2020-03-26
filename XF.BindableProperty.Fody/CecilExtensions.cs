@@ -40,19 +40,19 @@ namespace Mono.Cecil {
 
 		public static IEnumerable<CustomAttribute> GetAttributes( this ICustomAttributeProvider provider, string fullName )
 			=> provider.CustomAttributes.GetAttributes( fullName );
-		public static IEnumerable<CustomAttribute> GetAttributes( this IEnumerable<CustomAttribute> attributes, string fullName ) 
+		public static IEnumerable<CustomAttribute> GetAttributes( this IEnumerable<CustomAttribute> attributes, string fullName )
 			=> attributes.Where( attribute => attribute.Constructor.DeclaringType.FullName == fullName );
 
-		public static CustomAttribute GetAttribute( this IEnumerable<CustomAttribute> attributes, string fullName ) 
+		public static CustomAttribute GetAttribute( this IEnumerable<CustomAttribute> attributes, string fullName )
 			=> attributes.FirstOrDefault( attribute => attribute.Constructor.DeclaringType.FullName == fullName );
 		public static CustomAttribute GetAttribute( this ICustomAttributeProvider provider, string fullName )
 			=> provider.CustomAttributes.GetAttribute( fullName );
 
-		public static bool ContainsAttribute( this IEnumerable<CustomAttribute> attributes, string fullName ) 
+		public static bool ContainsAttribute( this IEnumerable<CustomAttribute> attributes, string fullName )
 			=> attributes.Any( attribute => attribute.Constructor.DeclaringType.FullName == fullName );
 		public static bool HasAttribute( this ICustomAttributeProvider provider, string fullName )
 			=> provider != null && provider.CustomAttributes.ContainsAttribute( fullName );
-		
+
 
 		public static T GetValue<T>( this CustomAttribute attribute, string propertyName, T defaultValue = default ) {
 			var value = attribute.Properties.SingleOrDefault( p => p.Name == propertyName ).Argument.Value;

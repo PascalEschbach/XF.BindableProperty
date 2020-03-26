@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 
 namespace XF.BindableProperty {
-	
+
 	[AttributeUsage( AttributeTargets.Property, AllowMultiple = false )]
 	public class BindableAttribute : Attribute {
 
