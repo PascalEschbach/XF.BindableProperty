@@ -20,8 +20,8 @@ public partial class ModuleWeaver {
         //Remove backing field
         property.DeclaringType.Fields.Remove( propertyInfo.BackingField );
 
-		//Find static constructor
-		var staticConstructorFlags = MethodAttributes.Private | MethodAttributes.HideBySig | MethodAttributes.SpecialName | MethodAttributes.RTSpecialName | MethodAttributes.Static;
+        //Find static constructor
+        var staticConstructorFlags = MethodAttributes.Private | MethodAttributes.HideBySig | MethodAttributes.SpecialName | MethodAttributes.RTSpecialName | MethodAttributes.Static;
 		var staticConstructor = property.DeclaringType.Methods.FirstOrDefault( x => x.Name == ".cctor" && x.Attributes.HasFlag( staticConstructorFlags ) );
 		if( staticConstructor is null ) {
 			staticConstructor = new MethodDefinition( ".cctor", MethodAttributes.Private | staticConstructorFlags, ModuleDefinition.TypeSystem.Void );
@@ -129,6 +129,7 @@ public partial class ModuleWeaver {
         
         foreach( var ctor in constructors ) {
 
+            ctor.Body.SimplifyMacros();
             var assignments = ctor.Body.Instructions
                 .Where( i => i.OpCode.Code == Code.Stfld && i.Operand is FieldReference field && field.Name == property.BackingField.Name )
                 .ToArray();
@@ -146,7 +147,7 @@ public partial class ModuleWeaver {
             do {
                 instructions.Insert( 0, cursor );
                 cursor = cursor.Previous;
-            } while( cursor != null && cursor.OpCode.Code != Code.Ldarg_0 && cursor.OpCode.Code != Code.Ldarg_1 );
+            } while( cursor != null && cursor.OpCode.Code != Code.Ldarg );
 
             //If there is a conditional, the jump point will point to the stfld instruction which gets stripped
             //As such we create a nop and reroute all jumps to the stfld IL to the new nop
@@ -155,18 +156,39 @@ public partial class ModuleWeaver {
             foreach( var instruction in instructions.Where( i => i.Operand is Instruction jumpPoint && jumpPoint == instructions.Last() ) )
                 instruction.Operand = nop;
 
-            //We remove all instructions from the constructor, including the thisptr (which isnt consumed by the previous while loop)
+            //We remove all instructions from the constructor, including the thisptr( which isnt consumed by the previous while loop )
             ctor.Body.Instructions.Remove( instructions.First().Previous ); //Pop thisptr
             foreach( var instruction in instructions )
                 ctor.Body.Instructions.Remove( instruction );
 
+            //We remove all variables associated with the instructions
+            var variables = instructions
+                .Where( i => i.OpCode.Code == Code.Ldloc || i.OpCode.Code == Code.Ldloca )
+                .Select( i => i.Operand as VariableDefinition )
+                .Distinct()
+                .ToArray();
+
+            //Remove only those variables which arent reused in the remaining instructions (just in case)
+            foreach( var variable in variables.Where( v => !ctor.Body.Instructions.Any( i => i.Operand == v )))
+                ctor.Body.Variables.Remove( variable );
+
             //Remove trailing stfld as we only use the actual construction of the argument
             initialization = instructions.Take( instructions.Count - 1 ).ToArray();
+            ctor.Body.Optimize();
         }
 
         if( initialization is null )
             EmitDefaultValue( property.Property, il );
         else {
+            var variables = initialization
+                .Where( i => i.OpCode.Code == Code.Ldloc || i.OpCode.Code == Code.Ldloca )
+                .Select( i => i.Operand as VariableDefinition )
+                .Distinct()
+                .ToArray();
+
+            foreach( var variable in variables )
+                il.Body.Variables.Add( variable );
+
             foreach( var instruction in initialization )
                 il.Append( instruction );
         }
