@@ -18,7 +18,7 @@ Install the [XF.BindableProperty.Fody NuGet package](https://nuget.org/packages/
 
 ```powershell
 PM> Install-Package Fody
-PM> Install-Package PropertyChanged.Fody
+PM> Install-Package XF.BindableProperty.Fody
 ```
 
 The `Install-Package Fody` is required since NuGet always defaults to the oldest, and most buggy, version of any dependency.
@@ -94,7 +94,7 @@ public class Foo : BindableObject
     private static void OnBarChanging( BindableObject bindable, object oldValue, object newValue ) => throw new NotImplementedException();
     private static object OnCoerceBarValue( BindableObject bindable, object value ) => throw new NotImplementedException();
     private static bool OnValidateBarValue( BindableObject bindable, object value ) => throw new NotImplementedException();
-	private static object OnCreateBarValue( BindableObject bindable ) => throw new NotImplementedException();
+    private static object OnCreateBarValue( BindableObject bindable ) => throw new NotImplementedException();
 }
 ```
 
@@ -111,7 +111,7 @@ public class Foo : BindableObject
         OnPropertyChanging= nameof(PropertyChangingMethod),
         OnCoerceValue = nameof(CoerceValueMethod),
         OnValidateValue = nameof(ValidateValueMethod),
-        OnCreateValue = nameof(CreateValueMethod),
+        OnCreateValue = nameof(CreateValueMethod)
     )]
     public string Bar { get; set; }
 
@@ -119,12 +119,34 @@ public class Foo : BindableObject
     private static void PropertyChangingMethod( BindableObject bindable, object oldValue, object newValue ) => throw new NotImplementedException();
     private static object CoerceValueMethod( BindableObject bindable, object value ) => throw new NotImplementedException();
     private static bool ValidateValueMethod( BindableObject bindable, object value ) => throw new NotImplementedException();
-	private static object CreateValueMethod( BindableObject bindable ) => throw new NotImplementedException();
+    private static object CreateValueMethod( BindableObject bindable ) => throw new NotImplementedException();
 }
 ```
 
 * If the method doesn't exist or any other error, such as signature mismatch, is found, the weaver will throw an exception.
 * The method names can be anything.
+
+### Default values
+
+Initializing your property with a normal property initializer is enough to instruct the system with the necessary information. The property initializer will automatically be included in the BindableProperty.Create method call. This approach is constrained by normal field/property initializer rules.
+
+If instead you need more fine grained control or instance level access, you can register (or implicitly) use the 'OnCreateValue' callback.
+
+```csharp
+public class Foo : BindableObject
+{
+    [Bindable]
+    public string Default { get; set; } = "abc";
+   
+    [Bindable( OnCreateValue = nameof(CreateValueMethod))]
+    public string Explicit { get; set; }
+    private static object CreateValueMethod( BindableObject bindable ) => "abc"; //Instance level access throught 'bindable' argument
+    
+    [Bindable]
+    public string Implicit { get; set; }
+    private static object OnCreateImplicitValue( BindableObject bindable ) => "abc"; //Instance level access throught 'bindable' argument
+}
+```
 
 
 ## Remarks
