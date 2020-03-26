@@ -5,7 +5,7 @@
 
 ### This is an add-in for [Fody](https://github.com/Fody/Home/).
 
-Injects code which raises the [`PropertyChanged` event](https://msdn.microsoft.com/en-us/library/system.componentmodel.inotifypropertychanged.propertychanged.aspx), into property setters of classes which implement [INotifyPropertyChanged](https://msdn.microsoft.com/en-us/library/system.componentmodel.inotifypropertychanged.aspx).
+Turns your auto properties into Xamarin.Forms [BindableProperties](https://docs.microsoft.com/de-de/dotnet/api/xamarin.forms.bindableproperty?view=xamarin-forms).
 
 ## Usage
 
@@ -121,6 +121,7 @@ public class Foo : BindableObject
     private static bool ValidateValueMethod( BindableObject bindable, object value ) => throw new NotImplementedException();
 	private static object CreateValueMethod( BindableObject bindable ) => throw new NotImplementedException();
 }
+```
 
 * If the method doesn't exist or any other error, such as signature mismatch, is found, the weaver will throw an exception.
 * The method names can be anything.
