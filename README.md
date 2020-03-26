@@ -148,9 +148,18 @@ public class Foo : BindableObject
 }
 ```
 
+### Other
+
+* The binding mode can be controlled via the 'BindingMode' property of the attribute.
+* The concrete owner of the BindableProperty can be controlled via the 'OwningType' property.
+
 
 ## Remarks
-
+* **Auto-Properties**: Only auto properties are supported. Properties with getter/setter bodies are invalid by definition either way as Xamarin accesses the BindableProperty directly, not the actual property. As such, custom getter/setter implementations would cause diverging behaviours between XAML and code. 
+* **OnCoerceValue**: Use this callback to constrain inputs instead of a custom getter/setter!
+* **OnValidateValue**: Use this callback to do any input validation!
+* **OnPropertyChanged/OnPropertyChanging**: Use those callbacks to notify dependant properties or trigger custom behaviour!
+* **OnCreateValue**: Use this callback to construct a default value which required instance level access or runtime information!
 
 ## Icon
 
