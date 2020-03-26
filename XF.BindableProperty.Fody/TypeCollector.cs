@@ -10,6 +10,6 @@ public partial class ModuleWeaver {
 		=> from type in ModuleDefinition.Types
 		   where type.Inherits( WeavingTypes.BindableObjectDef )
 		   from property in type.Properties
-		   where property.HasAttribute( BINDABLE_ATTRIBUTE_NAME )
+		   where property.HasAttribute( Constants.BindableAttribute )
 		   select new BindableProperty( property, this );
 }

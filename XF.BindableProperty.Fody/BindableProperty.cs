@@ -39,26 +39,27 @@ public partial class ModuleWeaver {
 			Property = property;
 			BackingField = property.DeclaringType.Fields.SingleOrDefault( f => f.Name == $"<{property.Name}>k__BackingField" );
 
-			var attribute = property.GetAttribute( BINDABLE_ATTRIBUTE_NAME );
-			BindingMode = (XFBindingMode)attribute.ConstructorArguments[0].Value;
+			var attribute = property.GetAttribute( Constants.BindableAttribute );
 
-			ValidateValueMethod = ResolveMethod( attribute.ConstructorArguments[1].Value as string, $"OnValidate{property.Name}Value", 
+			BindingMode = attribute.GetValue( Constants.BindingMode, XFBindingMode.OneWay );
+
+			ValidateValueMethod = ResolveMethod( attribute.GetValue<string>( Constants.OnValidateValue ), $"OnValidate{property.Name}Value", 
 				SystemTypes.BoolDef, 
 				WeavingTypes.BindableObjectDef, SystemTypes.ObjectDef );
-			PropertyChangedMethod = ResolveMethod( attribute.ConstructorArguments[2].Value as string, $"On{property.Name}Changed", 
+			PropertyChangedMethod = ResolveMethod( attribute.GetValue<string>( Constants.OnPropertyChanged ), $"On{property.Name}Changed", 
 				SystemTypes.VoidDef, 
 				WeavingTypes.BindableObjectDef, SystemTypes.ObjectDef, SystemTypes.ObjectDef );
-			PropertyChangingMethod = ResolveMethod( attribute.ConstructorArguments[3].Value as string, $"On{property.Name}Changing",
+			PropertyChangingMethod = ResolveMethod( attribute.GetValue<string>( Constants.OnPropertyChanging ), $"On{property.Name}Changing",
 				SystemTypes.VoidDef, 
 				WeavingTypes.BindableObjectDef, SystemTypes.ObjectDef, SystemTypes.ObjectDef );
-			CoerceValueMethod = ResolveMethod( attribute.ConstructorArguments[4].Value as string, $"OnCoerce{property.Name}",
+			CoerceValueMethod = ResolveMethod( attribute.GetValue<string>( Constants.OnCoerceValue ), $"OnCoerce{property.Name}",
 				SystemTypes.ObjectDef, 
 				WeavingTypes.BindableObjectDef, SystemTypes.ObjectDef );
-			DefaultValueCreatorMethod = ResolveMethod( attribute.ConstructorArguments[5].Value as string, $"OnCreate{property.Name}Value",
+			DefaultValueCreatorMethod = ResolveMethod( attribute.GetValue<string>( Constants.OnCreateValue ), $"OnCreate{property.Name}Value",
 				SystemTypes.ObjectDef,
 				WeavingTypes.BindableObjectDef );
 
-			OwningType = ( attribute.ConstructorArguments[6].Value as TypeReference )?.Resolve() ?? property.DeclaringType;
+			OwningType = attribute.GetValue<TypeReference>( Constants.OwningType )?.Resolve() ?? property.DeclaringType;
 		}
 
 		private MethodDefinition ResolveMethod( string name, string searchName, TypeDefinition returnType, params TypeDefinition[] signature ) {

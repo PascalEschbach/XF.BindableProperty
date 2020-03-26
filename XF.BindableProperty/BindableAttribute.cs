@@ -4,19 +4,17 @@ using System.Text;
 
 namespace XF.BindableProperty {
 	
-	[AttributeUsage( AttributeTargets.Property )]
+	[AttributeUsage( AttributeTargets.Property, AllowMultiple = false )]
 	public class BindableAttribute : Attribute {
 
-		public BindableAttribute( 
-			XFBindingMode bindingMode = XFBindingMode.OneWay,
+		public XFBindingMode BindingMode { get; set; } = XFBindingMode.OneWay;
 
-			string validateValueMethodName = null,
-			string propertyChangedMethodName = null,
-			string propertyChangingMethodName = null,
-			string coerceValueMethodName = null,
-			string defaultValueCreatorMethodName = null,
+		public Type OwningType { get; set; }
 
-			Type declaringType = null
-		) {}
+		public string OnPropertyChanged { get; set; }
+		public string OnPropertyChanging { get; set; }
+		public string OnCoerceValue { get; set; }
+		public string OnCreateValue { get; set; }
+		public string OnValidateValue { get; set; }
 	}
 }

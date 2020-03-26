@@ -15,13 +15,13 @@ public partial class ModuleWeaver {
         var propertyType = ModuleDefinition.ImportReference( property.PropertyType );
 
         //Remove attribute
-        property.CustomAttributes.Remove( propertyInfo.Property.GetAttribute( BINDABLE_ATTRIBUTE_NAME ) );
+        property.CustomAttributes.Remove( propertyInfo.Property.GetAttribute( Constants.BindableAttribute ) );
 
         //Remove backing field
         property.DeclaringType.Fields.Remove( propertyInfo.BackingField );
 
 		//Find static constructor
-		var staticConstructorFlags = MethodAttributes.HideBySig | MethodAttributes.SpecialName | MethodAttributes.RTSpecialName | MethodAttributes.Static;
+		var staticConstructorFlags = MethodAttributes.Private | MethodAttributes.HideBySig | MethodAttributes.SpecialName | MethodAttributes.RTSpecialName | MethodAttributes.Static;
 		var staticConstructor = property.DeclaringType.Methods.FirstOrDefault( x => x.Name == ".cctor" && x.Attributes.HasFlag( staticConstructorFlags ) );
 		if( staticConstructor is null ) {
 			staticConstructor = new MethodDefinition( ".cctor", MethodAttributes.Private | staticConstructorFlags, ModuleDefinition.TypeSystem.Void );

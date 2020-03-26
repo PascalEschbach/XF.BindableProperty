@@ -141,7 +141,12 @@ namespace Mono.Cecil {
 			=> provider != null ? provider.CustomAttributes.FirstOrDefault( ( c ) => c.AttributeType.Resolve() == attrDef.Resolve() ) : null;
 
 
-		public static bool HasReturnType( this MethodReference method )
+		public static T GetValue<T>( this CustomAttribute attribute, string propertyName, T defaultValue = default ) {
+			var value = attribute.Properties.SingleOrDefault( p => p.Name == propertyName ).Argument.Value;
+			return value is null ? defaultValue : (T)value;
+		}
+
+			public static bool HasReturnType( this MethodReference method )
 			=> method.ReturnType.Resolve().Name != "Void";
 
 	}

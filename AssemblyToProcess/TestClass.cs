@@ -4,7 +4,7 @@ using XF.BindableProperty;
 
 public class TestClass : BindableObject {
 
-	[Bindable( XFBindingMode.TwoWay, coerceValueMethodName: nameof( CoerceValueDelegate ) )]
+	[Bindable( OnCoerceValue = nameof( CoerceValueDelegate ), OwningType = typeof(Color))]
 	public string Auto { get; set; } = "This is a test";
 
 

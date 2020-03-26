@@ -13,9 +13,6 @@ using System.Diagnostics;
 
 public partial class ModuleWeaver : BaseModuleWeaver {
 
-    private static readonly string BINDABLE_ATTRIBUTE_NAME = "XF.BindableProperty.BindableAttribute";
-
-
     public override bool ShouldCleanReference => true;
 
     public override IEnumerable<string> GetAssembliesForScanning() {
