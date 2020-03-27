@@ -179,6 +179,7 @@ public class Foo : BindableObject
 * **OnValidateValue**: Use this callback to do any input validation!
 * **OnPropertyChanged/OnPropertyChanging**: Use those callbacks to notify dependant properties or trigger custom behaviour!
 * **OnCreateValue**: Use this callback to construct a default value which required instance level access or runtime information!
+* **Readonly properties**: All properties without a publicly available constructor (or none) will automatically be turned into readonly properties following the BindableProperty/BindablePropertyKey pattern.
 
 ## Roadmap
 * Attached properties
