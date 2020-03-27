@@ -20,6 +20,7 @@ public static class WeaverTypes {
     public static MethodReference SetValue { get; private set; }
     public static MethodReference SetReadonlyValue { get; private set; }
     public static MethodReference GetValue { get; private set; }
+    public static MethodReference GetBindablePropertyFromKey { get; private set; }
 
     public static TypeReference BindingMode { get; private set; }
     public static TypeReference ValidateValueDelegate { get; private set; }
@@ -53,6 +54,8 @@ public static class WeaverTypes {
         BindableObject = weaver.Resolve( nameof( BindableObject ) );
         BindableProperty = weaver.Resolve( nameof( BindableProperty ) );
         BindablePropertyKey = weaver.Resolve( nameof( BindablePropertyKey ) );
+
+        GetBindablePropertyFromKey = weaver.ModuleDefinition.ImportReference( BindablePropertyKey.Resolve().Properties.Single( m => m.Name == "BindableProperty" ).GetMethod );
 
         SetValue = weaver.ModuleDefinition.ImportReference( BindableObject.Resolve().Methods.Single( m => m.Name == "SetValue" && m.IsPublic && m.Parameters.First().ParameterType.Name == "BindableProperty" ) );
         SetReadonlyValue = weaver.ModuleDefinition.ImportReference( BindableObject.Resolve().Methods.Single( m => m.Name == "SetValue" && m.IsPublic && m.Parameters.First().ParameterType.Name == "BindablePropertyKey" ) );

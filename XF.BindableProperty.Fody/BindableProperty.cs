@@ -85,8 +85,7 @@ public class BindableProperty {
             throw new WeavingException( $"Cannot weave property {Property.FullName} as its not an auto property!" );
 
         //Weave the static BindableProperty field
-        var propertyField = WeavePropertyField();
-
+        var properties = WeavePropertyField();
 
         //Weave getter
         if( Property.GetMethod != null ) {
@@ -94,7 +93,7 @@ public class BindableProperty {
             var il = Property.GetMethod.Body.GetILProcessor();
 
             il.Emit( OpCodes.Ldarg, 0 );
-            il.Emit( OpCodes.Ldsfld, propertyField );
+            il.Emit( OpCodes.Ldsfld, properties.field );
             il.Emit( OpCodes.Call, WeaverTypes.GetValue );
 
             if( PropertyType.IsValueType )
@@ -111,12 +110,12 @@ public class BindableProperty {
             var il = Property.SetMethod.Body.GetILProcessor();
 
             il.Emit( OpCodes.Ldarg, 0 );
-            il.Emit( OpCodes.Ldsfld, propertyField );
+            il.Emit( OpCodes.Ldsfld, IsReadonly ? properties.key : properties.field );
             il.Emit( OpCodes.Ldarg, 1 );
             if( PropertyType.IsValueType )
                 il.Emit( OpCodes.Box, PropertyType );
 
-            il.Emit( OpCodes.Call, WeaverTypes.SetValue );
+            il.Emit( OpCodes.Call, IsReadonly ? WeaverTypes.SetReadonlyValue : WeaverTypes.SetValue );
 
             il.Emit( OpCodes.Ret );
         }
@@ -130,12 +129,19 @@ public class BindableProperty {
         foreach( var initializer in Initializers )
             initializer.Strip();
     }
-    private FieldDefinition WeavePropertyField() {
+    private (FieldDefinition field, FieldDefinition key) WeavePropertyField() {
 
         //Add static property field
         var propertyField = new FieldDefinition( Property.Name + "Property", FieldAttributes.Public | FieldAttributes.Static | FieldAttributes.InitOnly, WeaverTypes.BindableProperty );
         propertyField.CustomAttributes.Add( new CustomAttribute( WeaverTypes.CompilerGeneratedAttributeConstructor ) );
         Property.DeclaringType.Fields.Add( propertyField );
+
+        FieldDefinition keyField = null;
+        if( IsReadonly ) {
+            keyField = new FieldDefinition( Property.Name + "PropertyKey", FieldAttributes.Private | FieldAttributes.Static | FieldAttributes.InitOnly, WeaverTypes.BindablePropertyKey );
+            keyField.CustomAttributes.Add( new CustomAttribute( WeaverTypes.CompilerGeneratedAttributeConstructor ) );
+            Property.DeclaringType.Fields.Add( keyField );
+        }
 
         //Weave static property field construction
         var cctor = Property.DeclaringType.GetOrAddStaticConstructor();
@@ -174,14 +180,21 @@ public class BindableProperty {
         EmitDelegate( il, WeaverTypes.CreateDefaultValueDelegate.Resolve(), DefaultValueCreatorMethod );
 
         //Property = BindableProperty.Create( ... )
-        il.Emit( OpCodes.Call, WeaverTypes.Create );
-        il.Emit( OpCodes.Stsfld, propertyField );
+        il.Emit( OpCodes.Call, IsReadonly ? WeaverTypes.CreateReadonly : WeaverTypes.Create );
+        il.Emit( OpCodes.Stsfld, IsReadonly ? keyField : propertyField );
+
+        //Assign property field from key if readonly
+        if( IsReadonly ) {
+            il.Emit( OpCodes.Ldsfld, keyField );
+            il.Emit( OpCodes.Call, WeaverTypes.GetBindablePropertyFromKey );
+            il.Emit( OpCodes.Stsfld, propertyField );
+        }
 
         il.Emit( OpCodes.Ret );
 
         cctor.Body.Optimize();
 
-        return propertyField;
+        return ( propertyField, keyField );
     }
     private void EmitDelegate( ILProcessor il, TypeDefinition delegateType, MethodDefinition method ) {
         il.Emit( OpCodes.Ldnull );
@@ -197,7 +210,7 @@ public class BindableProperty {
             DefaultValueGenerator.EmitDefaultValue( il, PropertyType );
             return;
         }
-
+        
         //Emit field initializer from constructor
         var initializer = Initializers.First();
         var instructions = initializer.Instructions.Skip( 1 ).Copy();
