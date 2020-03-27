@@ -47,6 +47,12 @@ public class Foo : BindableObject
 
     [Bindable( BindingMode = XFBindingMode.OneTime, OwningType = typeof(Color))]
     public string Baz { get; set; } = "abc123";
+    
+    [Bindable]
+    public string ReadonlyBar { get; } = "abc123"
+    
+    [Bindable]
+    public string ReadonlyBaz { get; private set; }
 }
 ```
 
@@ -55,16 +61,29 @@ What gets compiled:
 ```csharp
 public class Foo : BindableObject
 {
-    public static readonly BarProperty = BindableProperty.Create(nameof(Bar), typeof(string), typeof(Foo), default(string), BindingMode.OneWay);
+    public static readonly BindableProperty BarProperty = BindableProperty.Create(nameof(Bar), typeof(string), typeof(Foo), default(string), BindingMode.OneWay);
     public string Bar {
         get => (string)GetValue(BarProperty);
         set => SetValue(BarProperty, value);
     }
 
-    public static readonly BazProperty = BindableProperty.Create(nameof(Baz), typeof(string), typeof(Color), "abc123", BindingMode.OneTime);
+    public static readonly BindableProperty BazProperty = BindableProperty.Create(nameof(Baz), typeof(string), typeof(Color), "abc123", BindingMode.OneTime);
     public string Baz {
         get => (string)GetValue(BazProperty);
         set => SetValue(BazProperty, value);
+    }
+    
+    public static readonly BindablePropertyKey ReadonlyBarPropertyKey = BindableProperty.CreateReadOnly(nameof(ReadonlyBar), typeof(string), typeof(Foo), "abc123", BindingMode.OneWay);
+    public static readonly BindableProperty ReadonlyBarProperty = ReadonlyBarPropertyKey.BindableProperty;
+    public string ReadonlyBar {
+        get => (string)GetValue(ReadonlyBarProperty);
+    }
+    
+    public static readonly BindablePropertyKey ReadonlyBazPropertyKey = BindableProperty.CreateReadOnly(nameof(ReadonlyBaz), typeof(string), typeof(Foo), default(string), BindingMode.OneWay);
+    public static readonly BindableProperty ReadonlyBazProperty = ReadonlyBazPropertyKey.BindableProperty;
+    public string ReadonlyBaz {
+        get => (string)GetValue(ReadonlyBazProperty);
+        private set => SetValue(ReadonlyBazPropertyKey, value);
     }
 }
 ```
