@@ -37,4 +37,9 @@ public static class ILProcessorExtension {
 
 		processor.Remove( instruction );
 	}
+
+	public static void ReplaceAndUpdateJumps( this ILProcessor processor, Instruction oldIL, Instruction newIL ) {
+		processor.Replace( oldIL, newIL );
+		oldIL.Replace( newIL );
+	}
 }

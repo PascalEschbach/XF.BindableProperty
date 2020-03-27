@@ -23,14 +23,13 @@ public partial class ModuleWeaver : BaseModuleWeaver {
 
     public override void Execute() {
 
-        SystemTypes.Initialize( this );
-        WeavingTypes.Initialize( this );
+        WeaverTypes.Initialize( this );
 
         var properties = CollectProperties().ToArray();
-        if( properties.Any( p => !p.IsAuto ) )
+        if( properties.Any( p => !p.IsAutoProperty ) )
             throw new WeavingException( "Only auto properties are supported!" );
 
         foreach( var property in properties )
-            WeaveProperty( property );
+            property.Weave();
     }
 }

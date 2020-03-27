@@ -6,7 +6,24 @@ using Mono.Cecil.Cil;
 
 public static class InstructionLinker {
 
-	public static IEnumerable<Instruction> Copy( IEnumerable<Instruction> instructions ) {
+	public static IEnumerable<VariableDefinition> CopyVariables( this IEnumerable<Instruction> instructions ) {
+
+		var variables = instructions
+			.Where( i => i.Operand is VariableDefinition )
+			.Select( i => i.Operand as VariableDefinition )
+			.Distinct()
+			.ToDictionary(
+				v => v,
+				v => new VariableDefinition( v.VariableType )
+			);
+
+		foreach( var instruction in instructions.Where( i => i.Operand is VariableDefinition ) )
+			instruction.Operand = variables[instruction.Operand as VariableDefinition];
+
+		return variables.Values;
+	}
+
+	public static IEnumerable<Instruction> Copy( this IEnumerable<Instruction> instructions ) {
 
 		//Copy body
 		var originalBody = instructions.ToList();
@@ -26,7 +43,7 @@ public static class InstructionLinker {
 
 		return body;
 	}
-	public static IEnumerable<Instruction> Link( IEnumerable<Instruction> instructions ) {
+	public static IEnumerable<Instruction> Link( this IEnumerable<Instruction> instructions ) {
 		var body = instructions.ToArray();
 		for( int i = 0; i < body.Length; i++ ) {
 			if( i > 0 )

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-public static class Constants {
+public static class WeaverConstants {
 
     public const string BindableAttribute = "XF.BindableProperty." + nameof( BindableAttribute );
     public const string BindingMode = nameof( BindingMode );
