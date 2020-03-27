@@ -49,7 +49,7 @@ public class Foo : BindableObject
     public string Baz { get; set; } = "abc123";
     
     [Bindable]
-    public string ReadonlyBar { get; } = "abc123"
+    public string ReadonlyBar { get; } = "abc123";
     
     [Bindable]
     public string ReadonlyBaz { get; private set; }
