@@ -73,13 +73,13 @@ public class Foo : BindableObject
         set => SetValue(BazProperty, value);
     }
     
-    public static readonly BindablePropertyKey ReadonlyBarPropertyKey = BindableProperty.CreateReadOnly(nameof(ReadonlyBar), typeof(string), typeof(Foo), "abc123", BindingMode.OneWay);
+    private static readonly BindablePropertyKey ReadonlyBarPropertyKey = BindableProperty.CreateReadOnly(nameof(ReadonlyBar), typeof(string), typeof(Foo), "abc123", BindingMode.OneWay);
     public static readonly BindableProperty ReadonlyBarProperty = ReadonlyBarPropertyKey.BindableProperty;
     public string ReadonlyBar {
         get => (string)GetValue(ReadonlyBarProperty);
     }
     
-    public static readonly BindablePropertyKey ReadonlyBazPropertyKey = BindableProperty.CreateReadOnly(nameof(ReadonlyBaz), typeof(string), typeof(Foo), default(string), BindingMode.OneWay);
+    private static readonly BindablePropertyKey ReadonlyBazPropertyKey = BindableProperty.CreateReadOnly(nameof(ReadonlyBaz), typeof(string), typeof(Foo), default(string), BindingMode.OneWay);
     public static readonly BindableProperty ReadonlyBazProperty = ReadonlyBazPropertyKey.BindableProperty;
     public string ReadonlyBaz {
         get => (string)GetValue(ReadonlyBazProperty);
