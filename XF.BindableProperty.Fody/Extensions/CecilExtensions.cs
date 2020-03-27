@@ -9,7 +9,7 @@ namespace Mono.Cecil {
 
     public static class CecilExtensions {
 
-        private static bool HasSameSignature( this MethodDefinition method, params TypeDefinition[] signature ) {
+        private static bool HasSameSignature( this MethodDefinition method, params TypeReference[] signature ) {
             if( method.HasGenericParameters )
                 return false;
 
@@ -18,7 +18,7 @@ namespace Mono.Cecil {
 
             return method.Parameters.Select( ( p, i ) => (p, signature[i]) ).All( p => p.Item1.ParameterType.FullName == p.Item2.FullName );
         }
-        public static bool HasSameSignature( this MethodDefinition method, TypeDefinition returnType, params TypeDefinition[] signature )
+        public static bool HasSameSignature( this MethodDefinition method, TypeReference returnType, params TypeReference[] signature )
             => method.HasSameSignature( signature ) && method.ReturnType?.FullName == returnType?.FullName;
 
         public static IEnumerable<TypeDefinition> GetInheritanceChain( this TypeDefinition definition ) {
@@ -36,6 +36,20 @@ namespace Mono.Cecil {
             => typeDef.GetAllInterfaces().Where( i => i.InterfaceType.FullName == interfaceType.FullName ).Count() > 0;
         public static bool Inherits( this TypeDefinition typeDef, TypeDefinition inheritedType )
             => typeDef.GetInheritanceChain().Where( t => t.FullName == inheritedType.FullName ).Count() > 0;
+
+        public static MethodDefinition GetOrAddStaticConstructor( this TypeDefinition type ) {
+            var ctor = type.GetStaticConstructor();
+            if( ctor is null ) {
+                ctor = new MethodDefinition( 
+                    ".cctor",
+                    MethodAttributes.Private | MethodAttributes.HideBySig | MethodAttributes.SpecialName | MethodAttributes.RTSpecialName | MethodAttributes.Static, 
+                    type.Module.TypeSystem.Void 
+                );
+                type.Methods.Add( ctor );
+                type.IsBeforeFieldInit = false;
+            }
+            return ctor;
+        }
 
 
         public static IEnumerable<CustomAttribute> GetAttributes( this ICustomAttributeProvider provider, string fullName )
