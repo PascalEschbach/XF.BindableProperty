@@ -84,8 +84,12 @@ public class BindableProperty {
         if( !IsAutoProperty )
             throw new WeavingException( $"Cannot weave property {Property.FullName} as its not an auto property!" );
 
+        if( Property.GetMethod is null || !Property.GetMethod.IsPublic )
+            throw new WeavingException( $"Cannot weave property {Property.FullName} as it has no publicly available getter!" );
+
         //Weave the static BindableProperty field
         var properties = WeavePropertyField();
+
 
         //Weave getter
         if( Property.GetMethod != null ) {
