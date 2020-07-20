@@ -230,5 +230,8 @@ public class BindableProperty {
 
         //Replace stfld with a nop (redirect all potential jumps aswell)
         il.ReplaceAndUpdateJumps( instructions.Last(), Instruction.Create( OpCodes.Nop ) );
+
+        if( PropertyType.IsValueType )
+            il.Emit( OpCodes.Box, PropertyType );
     }
 }
