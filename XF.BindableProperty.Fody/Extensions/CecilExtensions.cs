@@ -16,7 +16,7 @@ namespace Mono.Cecil {
             if( method.Parameters.Count != signature?.Length )
                 return false;
 
-            return method.Parameters.Select( ( p, i ) => (p, signature[i]) ).All( p => p.Item1.ParameterType.FullName == p.Item2.FullName );
+            return method.Parameters.Select( ( p, i ) => new { Param = p, Type = signature[i] } ).All( p => p.Param.ParameterType.FullName == p.Type.FullName );
         }
         public static bool HasSameSignature( this MethodDefinition method, TypeReference returnType, params TypeReference[] signature )
             => method.HasSameSignature( signature ) && method.ReturnType?.FullName == returnType?.FullName;

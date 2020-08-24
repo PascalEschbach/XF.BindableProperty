@@ -18,6 +18,16 @@ public enum XFBindingMode {
 
 public class BindableProperty {
 
+    private class PropertyField {
+        public FieldDefinition Field { get; }
+        public FieldDefinition Key { get; }
+
+        public PropertyField( FieldDefinition field, FieldDefinition key ) {
+            Field = field;
+            Key = key;
+        }
+    }
+
     public PropertyDefinition Property { get; }
     public TypeReference PropertyType { get; }
     public FieldDefinition BackingField { get; }
@@ -97,7 +107,7 @@ public class BindableProperty {
             var il = Property.GetMethod.Body.GetILProcessor();
 
             il.Emit( OpCodes.Ldarg, 0 );
-            il.Emit( OpCodes.Ldsfld, properties.field );
+            il.Emit( OpCodes.Ldsfld, properties.Field );
             il.Emit( OpCodes.Call, WeaverTypes.GetValue );
 
             if( PropertyType.IsValueType )
@@ -114,7 +124,7 @@ public class BindableProperty {
             var il = Property.SetMethod.Body.GetILProcessor();
 
             il.Emit( OpCodes.Ldarg, 0 );
-            il.Emit( OpCodes.Ldsfld, IsReadonly ? properties.key : properties.field );
+            il.Emit( OpCodes.Ldsfld, IsReadonly ? properties.Key : properties.Field );
             il.Emit( OpCodes.Ldarg, 1 );
             if( PropertyType.IsValueType )
                 il.Emit( OpCodes.Box, PropertyType );
@@ -133,7 +143,7 @@ public class BindableProperty {
         foreach( var initializer in Initializers )
             initializer.Strip();
     }
-    private (FieldDefinition field, FieldDefinition key) WeavePropertyField() {
+    private PropertyField WeavePropertyField() {
 
         //Add static property field
         var propertyField = new FieldDefinition( Property.Name + "Property", FieldAttributes.Public | FieldAttributes.Static | FieldAttributes.InitOnly, WeaverTypes.BindableProperty );
@@ -198,7 +208,7 @@ public class BindableProperty {
 
         cctor.Body.Optimize();
 
-        return ( propertyField, keyField );
+        return new PropertyField( propertyField, keyField );
     }
     private void EmitDelegate( ILProcessor il, TypeDefinition delegateType, MethodDefinition method ) {
         il.Emit( OpCodes.Ldnull );
